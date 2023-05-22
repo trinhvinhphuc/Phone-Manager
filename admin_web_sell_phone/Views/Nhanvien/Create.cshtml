@@ -1,0 +1,81 @@
+﻿@model NhanvienIndexModel
+
+<h1>Create</h1>
+
+<h4>Nhân Viên</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post" asp-action="Create" enctype="multipart/form-data">
+            
+            <div class="form-group">
+                <label asp-for="@Model.Tennhanvien" class="control-label">Tên Nhân viên</label>
+                <input asp-for="@Model.Tennhanvien" type="text" class="form-control" />
+                <span asp-validation-for="Tennhanvien" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.Ngaysinh" class="control-label">Ngày Sinh</label>
+                <input asp-for="@Model.Ngaysinh" type="date" class="form-control" />
+                <span asp-validation-for="@Model.Ngaysinh" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.Diachi" class="control-label">Địa chỉ</label>
+                <input asp-for="@Model.Diachi" type="text" class="form-control" />
+                <span asp-validation-for="@Model.Diachi" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.sdt" class="control-label">Số điện thoại</label>
+                <input asp-for="@Model.sdt" type="text" class="form-control" />
+                <span asp-validation-for="@Model.sdt" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.Email" class="control-label">Email</label>
+                <input asp-for="@Model.Email" type="text" class="form-control" />
+                <span asp-validation-for="@Model.Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.username" class="control-label">username</label>
+                <input asp-for="@Model.username" type="text" class="form-control" />
+                <span asp-validation-for="@Model.username" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.password" class="control-label">password</label>
+                <input type="password" asp-for="@Model.password"  class="form-control" />
+                <span asp-validation-for="@Model.password" class="text-danger"></span>
+            </div>
+            
+                            <div class="card-body">
+                                <div class="card-title">Ảnh nhân viên</div>
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <img id="FrontImagePrv" src="" atl="Logo Image" width="150" height="150"
+                                             style="border:1px; margin:20px " class="img-thumbnail" />
+                                        <div class="btn btn-primary btn-icon-text">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+
+                                            <input asp-for="@Model.Image" class="custom-file-input" onchange="document.getElementById('FrontImagePrv').src=window.URL.createObjectURL(this.files[0])" />
+                                            <span asp-validation-for="@Model.Image" class="text-danger"></span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        
+                
+                <!-- End row -->
+            
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

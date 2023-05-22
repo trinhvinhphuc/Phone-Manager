@@ -1,0 +1,110 @@
+﻿
+@{
+    var dshd = ViewBag.danhsachhoadon;
+    var dskh = ViewBag.khachhang;
+    var nv = ViewBag.nhanvien;
+}
+@functions {
+    private string getDateFormat(DateTime? date)
+    {
+
+        var notNullDate = date ?? DateTime.Now;
+        return notNullDate.ToString("dd/MM/yyyy");
+    }
+}
+<div class="d-flex flex-row justify-content-between mb-3">
+    <h2>Hóa đơn</h2>
+    <div>
+        <a href="@Url.Action("Create", "Hoadon")" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>
+            Tạo Hóa đơn
+        </a>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <!-- Begin Search Bar -->
+        <header class="header d-flex align-items-center justify-content-between ps-0" style="box-shadow: none;">
+            <div class="card-title">Danh sách hóa đơn</div>
+            <div class="search-bar" style="z-index: 0; background: none; position: inherit; visibility: visible; opacity: 1; box-shadow: none">
+                <form class="search-form d-flex align-items-center"
+                      method="get"
+                      action="@Url.Action("Index", "Hoadon")">
+                    <input type="text" name="SearchString" placeholder="Search" title="Enter search keyword">
+                    <button type="submit" title="Search">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </form>
+            </div>
+        </header><!-- End Search Bar -->
+        <table class="table table-hover bg-white align-middle">
+            <thead>
+                <tr class="text-center">
+                    <th scope="col">
+                        ID
+                    </th>
+                    <th scope="col">
+                        Tên khách hàng
+                    </th>
+                    <th scope="col">
+                        Tên nhân viên thực hiện
+                    </th>
+                    <th>
+                        Ngày tạo
+                    </th>
+                    <th scope="col">
+                        Tổng thành tiền
+                    </th>
+                </tr>
+            </thead>
+            @foreach (var item in dshd)
+            {
+                <tr class="text-center">
+                    <td scope="row">
+                        @item.ID_Hoadon
+
+                    </td>
+                    
+                        @foreach(var item2 in dskh)
+                        {
+                            if(item.ID_KhachHang == item2.ID_Khachhang)
+                            {
+                                <td>
+                                    @item2.TenKhachhang
+                                </td>
+                                break;
+                            }
+                        }
+                        @foreach(var item2 in nv)
+                        {
+                            if(item.ID_NhanVien == item2.ID_Nhanvien)
+                            {
+                                <td>
+                                    @item2.Tennhanvien
+                                </td>
+                                
+                                break;
+                            }
+                        }
+                    <td>
+                        @getDateFormat(item.Ngaytaophieu)
+                    </td>
+                    <td>
+                        @item.TongDon.ToString("N0") đ
+                    </td>
+                    <td>
+                        <a class="btn btn-primary" asp-action="Detail" asp-route-id="@item.ID_Hoadon">
+                            <i class="fas fa-bars"></i> Detail
+                        </a>
+                        <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.ID_Hoadon">
+                            <i class="fas fa-bars"></i> Edit
+                        </a>
+                        <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.ID_Hoadon">
+                            <i class="fas fa-bars"></i> Delete
+                        </a>
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>

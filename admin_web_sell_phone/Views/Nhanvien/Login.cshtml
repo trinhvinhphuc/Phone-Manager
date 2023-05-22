@@ -1,0 +1,121 @@
+﻿@{
+    ViewBag.Title = "Login";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>Quản lý bán điện thoại</title>
+
+    <!-- Favicons -->
+    <link href="~/Content/img/favicon.png" rel="icon">
+    <link href="~/Content/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="~/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="~/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="~/remixicon/remixicon.css" rel="stylesheet">
+    <link href="~/simple-datatables/style.css" rel="stylesheet">
+    <link href="~/js/fileinput.min.js" rel="stylesheet" />
+
+    <!-- Template Main CSS File -->
+    <link href="~/css/style.css" rel="stylesheet">
+    <link href="~/css/site.css" rel="stylesheet" />
+</head>
+
+<body class="p-0">
+
+
+    <main>
+        <div class="container-fluid">
+
+            <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-0">
+                <div class="container-fluid">
+                    <div class="row justify-content-center">
+                        <div class="col-md-6 col-12 d-flex flex-column align-items-center justify-content-center">
+
+                            <div class="d-flex justify-content-center py-4">
+                                <div class="logo d-flex align-items-center w-auto">
+                                    <h2 class="d-none d-lg-block">Hệ thống quản lý bán Điện Thoại</h2>
+                                </div>
+                            </div><!-- End Logo -->
+
+                            <div class="card mb-3">
+
+                                <div class="card-body">
+
+                                    <div class="pt-4 pb-2">
+                                        <h5 class="card-title text-center pb-0 fs-4">Đăng nhập</h5>
+                                        <p class="text-center small">Chào mừng bạn đã đến với chúng tôi</p>
+                                    </div>
+                                    @if (ViewBag.ErrorMessage != null)
+                                    {
+                                        <div class="alert alert-danger">
+                                            @ViewBag.ErrorMessage
+                                        </div>
+                                    }
+
+
+                                    <form asp-action="Login" method="post">
+
+                                        <div class="col-12">
+
+                                            <div class="row align-items-center">
+                                                <div class="col-12">
+                                                    <label for="inputPassword6" class="col-form-label">Tài khoản:</label>
+                                                </div>
+                                                <div class="col-12">
+                                                    <input name="username" type="text" id="inputUser" class="form-control" aria-describedby="passwordHelpInline">
+                                                </div>
+                                            </div>
+
+                                            <div class="row align-items-center">
+                                                <div class="col-12">
+                                                    <label for="inputPassword6" class="col-form-label">Mật khẩu:</label>
+                                                </div>
+                                                <div class="col-12">
+                                                    <input name="password" type="password" id="inputPassword6" class="form-control" aria-describedby="passwordHelpInline">
+                                                </div>
+                                            </div>
+
+
+                                            <div class="col-12 mt-3">
+                                                <button class="btn btn-primary form-control" type="submit">Đăng nhập</button>
+                                            </div>
+                                        </div>
+                                    </form>
+
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+        </div>
+    </main><!-- End #main -->
+
+    <script src="~/Scripts/nice-admin.js"></script>
+    <script src="~/Scripts/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/Scripts/vendor/chart.js/chart.min.js"></script>
+    <script src="~/Scripts/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="~/Scripts/vendor/tinymce/tinymce.min.js"></script>
+
+    <script src="~/Scripts/site.js" asp-append-version="true"></script>
+</body>
+
+</html>

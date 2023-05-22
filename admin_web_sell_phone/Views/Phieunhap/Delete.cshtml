@@ -1,0 +1,40 @@
+﻿@model admin_web_sell_phone.Entity.tb_Phieunhap
+
+@{
+    ViewData["Title"] = "Xóa hóa đơn";
+}
+
+<h1>Xóa hóa đơn</h1>
+
+<h3>Bạn chắc chắn muốn xóa hóa phiếu nhập này?</h3>
+<div>
+    <h4>Hóa đơn</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Mã nhà cung cấp
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ID_NhaCungCap)
+        </dd>
+        <dt class="col-sm-2">
+            Ngày tạo phiếu nhập
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Ngay_nhap)
+        </dd>
+        <dt class="col-sm-2">
+            Tổng phiếu nhập
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Tong_gia)
+        </dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="ID_Phieunhap" />
+        <input type="submit" value="Xóa" class="btn btn-danger" /> |
+        <a asp-action="Index">Trở lại</a>
+    </form>
+</div>
+

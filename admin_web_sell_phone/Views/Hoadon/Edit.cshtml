@@ -1,0 +1,117 @@
+﻿
+@{
+    ViewData["Title"] = "Chỉnh sửa hóa đơn";
+
+    var hd = ViewData["hoadon"] as HoaDonIndexModel;
+    var chitiethoadon = (dynamic)ViewData["cthd"];
+    var kh = ViewBag.khachhanglist;
+    var nhanvien = ViewBag.nhanvienlist;
+    var cthd = ViewBag.cthd;
+}
+@using (Html.BeginForm())
+{
+    @Html.ValidationSummary(true)
+    <h1>Chỉnh sửa</h1>
+
+    <h4>Hóa đơn</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-12">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" name="ID_Hoadon" value="@hd.ID_Hoadon"/>
+            <div class="form-group">
+                <label class="control-label" asp-for="@hd.ID_KhachHang">Khách hàng</label>
+            
+                <div class="col-md-12">
+                    <select name="ID_KhachHang" class="form-control">
+                        @{
+                            foreach (var item in kh)
+                            {
+                                if (item.ID_Khachhang == hd.ID_KhachHang)
+                                {
+                                <option value="@item.ID_Khachhang" selected>@item.TenKhachhang - @item.sdt</option>
+                                continue;
+                                }
+                                <option value="@item.ID_Khachhang">@item.TenKhachhang - @item.sdt</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <span asp-validation-for="@hd.ID_KhachHang" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@hd.ID_NhanVien" class="control-label">Nhân viên thực hiện</label>
+                <select name="ID_NhanVien" class="form-control">
+                    @{
+                        //int id = int.Parse(Session["userId"].ToString());
+                        foreach (var item in nhanvien)
+                        {
+                            if(item.ID_Nhanvien == hd.ID_NhanVien)
+                            {
+                                <option value="@item.ID_Nhanvien" selected>@item.Tennhanvien</option>
+                                continue;
+                            }
+                            <option value="@item.ID_Nhanvien">@item.Tennhanvien</option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="@hd.ID_NhanVien" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@hd.Ngaytaophieu" class="control-label">Ngày tạo phiếu</label>
+                <input name="Ngaytaophieu" class="form-control" type="date" value="@hd.Ngaytaophieu.ToString("yyyy-MM-dd")"/>
+                <span asp-validation-for="@hd.Ngaytaophieu" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@hd.TongDon" class="control-label">Tổng đơn (đv: đồng)</label>
+                <input type="text" name="TongDon" class="form-control" readonly value="@hd.TongDon" />
+                <span asp-validation-for="@hd.TongDon" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Lưu" class="btn btn-primary mt-2" />
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <a asp-action="Index">Trờ lại</a>
+    </div>
+}
+
+<div class="row">
+    <div class="col-12">
+        <h2>Danh sách sản phẩm</h2>
+    </div>
+    <div class="col-12">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Mã sản phẩm</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Giá bán</th>
+                    <th>Số lượng</th>
+                    <th>Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (chitiethoadon != null)
+                {
+                    int i = 1;
+                    int total;
+                    @foreach (var item in chitiethoadon)
+                    {
+                        total = item.Giaban * item.Soluongmua;
+                        <tr>
+                            <th>@i</th>
+                            <th>@item.tensanpham</th>
+                            <th>@item.Giaban.ToString("N0") đ</th>
+                            <th>@item.Soluongmua</th>
+                            <th>@total.ToString("N0") đ</th>
+                        </tr>
+                        i++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

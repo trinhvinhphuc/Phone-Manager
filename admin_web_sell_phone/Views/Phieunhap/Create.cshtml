@@ -1,0 +1,271 @@
+﻿@model admin_web_sell_phone.Models.PhieuNhapModel
+@{
+    var nhacungung = ViewBag.Nhacungung;
+    var sanpham = ViewBag.Sanpham;
+}
+@using (Html.BeginForm()){
+    <div class="d-flex flex-row justify-content-between mb-3">
+        <h2>Tạo phiếu nhập hàng</h2>
+        <div>
+            <a href="@Url.Action("Index", "Phieunhap")" class="btn btn-outline-primary mx-1">Thoát</a>
+            <button type="submit" class="btn btn-primary mx-1">Lưu</button>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-title">Thông tin phiếu nhập</div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label class="form-label">
+                                Nhà cung cấp
+                            </label>
+                            <div class="d-flex flex-row">
+                                <select class="form-select form-control" name="NhaCungCap">
+                                    <option value="newprovice" selected="selected">-----Nhà cung cấp mới-----</option>
+                                    @foreach (var ncc in nhacungung)
+                                    {
+                                        <option value="@ncc.ID_Nhacungcap">@ncc.Tennhacungcap</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    <div>
+                    <div class="row">
+                        <div class="col-md-12">
+                             <label class="form-label">
+                                 Ngày nhập hàng
+                             </label>
+                             <div class="d-flex flex-row">
+                                  @Html.TextBox("Ngaynhap", null, new { @class = "form-control", type = "Date", @id = "input_date" })
+                             </div>
+                        </div>
+                    </div>
+                     <div class="row">
+                         <div class="col-md-12">
+                                    <label asp-for="@Model.Tonggia" class="form-label">Tổng thành tiền (đơn vị: đồng)</label>
+                                    <input asp-for="@Model.Tonggia" class="form-control" readonly type="number" />
+                                    <span asp-validation-for="@Model.Tonggia" class="text-danger"></span>
+                         </div>
+                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+        <div class="row">
+                <!-- Begin Sản phẩm -->
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="card-title">Các sản phẩm</div>
+                            <table id="variants" class="table table-responsive table-hover bg-white align-middle text-center">
+                                <thead>
+                                <tr>
+                                    <th scope="col">
+                                        Hình ảnh
+                                    </th>
+                                    <th scope="col">
+                                        Sản phẩm
+                                    </th>
+                                    <th>
+                                        Giá nhập (đơn vị: đ)
+                                    </th>
+                                    <th>
+                                        Số lượng nhập
+                                    </th>
+                                    <th scope="col">
+                                        Tùy chọn
+                                    </th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+                                    @foreach(var item in sanpham)
+                                    {
+                                        <tr>
+                                        <td style="width: 100px; height: 100px;"><img src="~/@item.HinhAnh" class="img-thumbnail" /></td>
+                                            <td id="ten_@item.ID_sanpham">@item.Ten_Dienthoai</td>
+                                            <td>
+                                                <input type="number" value="10000" id="gn_@item.ID_sanpham" min=" = 0" />
+                                            </td>
+                                            <td>
+                                                <input type="number" value="1" id="sl_@item.ID_sanpham" min=" = 1" />
+                                            </td>
+                                            <td><button type="button" class="btn btn-outline-primary mx-2" id="@item.ID_sanpham" onclick="addchitietphieunhap(this)">Thêm</button></td>
+                                        </tr>
+                                    }
+                                </tbody>
+
+                            </table>
+                            <nav class="d-flex flex-row justify-content-end" aria-label="Page navigation">
+                                <ul class="pagination">
+
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div><!-- End Sản phẩm -->
+        </div>
+    <!-- Begin Chi tiết phiếu nhập -->
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-title">Chi tiết phiếu nhập</div>
+                    <table class="table table-responsive table-hover bg-white align-middle text-center">
+                        <thead>
+                            <tr>
+                                <th scope="col">
+                                    Sản phẩm
+                                </th>
+                                <th scope="col">
+                                    Giá nhập (đơn vị: đ)
+                                </th>
+                                <th scope="col">
+                                    Số lượng nhập
+                                </th>
+                                <th scope="col">
+                                    Thành tiền(đơn vị: đ)
+                                </th>
+                                <th scope="col">
+                                    Tùy chọn
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="chiTietPhieuNhap">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- Begin Chi tiết phiếu nhập -->
+        <textarea id="listCtpn" class="form-control d-none" name="listCtpn"></textarea>
+    </div>
+}
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<script>
+    let listctpn = [];
+    const textAreaListCtpn = document.querySelector("#listCtpn");
+    const chitietPhieunhap = document.querySelector("#chiTietPhieuNhap");
+    function addchitietphieunhap(btn){
+      var masp = btn.id;
+      var  sl = parseInt(document.getElementById("sl_"+masp).value);
+        
+       for(i = 0; i < listctpn.length ; i++){
+           if(listctpn[i].id == masp){
+            listctpn[i].sl = listctpn[i].sl + sl;
+                alert("Đã thêm sản phẩm vào phiếu nhập");
+                
+                update_Thanhtien();
+                return;
+           }
+       }
+       const ctpn = {
+            id: parseInt(masp),
+            sl: sl,
+            gn: parseInt(document.getElementById("gn_" + masp).value),
+            ten: document.getElementById("ten_" + masp).innerText,
+        };
+        listctpn.push(ctpn);
+        alert("Đã thêm sản phẩm vào đơn hàng");
+        update_Thanhtien();
+    }
+    function update_Thanhtien(){
+        var total = 0;
+        for (i = 0; i < listctpn.length; i++) {
+            total += listctpn[i].sl * listctpn[i].gn;
+        }
+
+        document.getElementById("Tonggia").value = total;
+        update_phieunhap()
+       
+    }
+    function update_phieunhap (){
+        document.getElementById('chiTietPhieuNhap').innerHTML = ""
+        
+        for(i = 0; i < listctpn.length ; i++){
+            const tr = document.createElement('tr')
+            const tdTen = document.createElement('td');
+            tdTen.append(listctpn[i].ten);
+
+            const tdgianhap = document.createElement('td');
+            tdgianhap.append(listctpn[i].gn);
+
+            const tdsoluong = document.createElement('td');
+            tdsoluong.className = 'd-flex flex-row justify-content-center';
+            const inputsoluong = document.createElement('input');
+            inputsoluong.className = 'form-control w-50'
+            inputsoluong.setAttribute('name', `${listctpn[i].id}`);
+            inputsoluong.setAttribute('value', listctpn[i].sl);
+            inputsoluong.setAttribute('min', 1);
+            inputsoluong.setAttribute('autocomplete', 'off');
+            inputsoluong.setAttribute('type', 'number');
+            inputsoluong.addEventListener('input', (e) => {
+                listctpn.forEach((ctpn) => {
+                    if (ctpn.id == parseInt(e.target.name)) {
+                        ctpn.sl = parseInt(e.target.value);
+                        update_phieunhap();
+                        textAreaListCtpn.value = JSON.stringify(listctpn);
+                        update_Thanhtien();
+                    }
+                })
+            })
+            tdsoluong.append(inputsoluong);
+
+            const tdThanhtien = document.createElement('td');
+            var total = listctpn[i].sl * listctpn[i].gn;
+           
+            
+            tdThanhtien.append(total);
+           const tdButton = document.createElement('td');
+            const button = document.createElement('button');
+            button.className = 'btn btn-outline-danger mx-2';
+            button.setAttribute('type', 'button');
+            button.textContent = 'xóa';
+            button.dataset.id = listctpn[i].id;
+            button.addEventListener('click', async (e) => {
+
+                const id = parseInt(e.target.dataset.id);
+                const tr = e.target.parentNode.parentNode;
+                var tt = e.target.parentNode.previousSibling;
+                var tongdon = document.getElementById("Tonggia").value;
+                tongdon = parseInt(tongdon.split(',').join('')) - parseInt(tt.innerText);
+                
+                tr.parentNode.removeChild(tr);
+                listctpn = listctpn.filter(ctpn => ctpn.id != id);
+                textAreaListCtpn.value = JSON.stringify(listctpn);
+                update_Thanhtien();
+            });
+            tdButton.append(button);
+
+            textAreaListCtpn.value = JSON.stringify(listctpn);
+            tr.append(tdTen, tdgianhap, tdsoluong, tdThanhtien, tdButton);
+            console.log(tr);
+            chitietPhieunhap.appendChild(tr);
+        }
+        function catid (name){
+            return name.split("_",2);
+        }
+    }
+    function createdate_for_input_date() {
+        var curDate = new Date();
+        // Ngày hiện tại
+        var curDay = curDate.getDate();
+        // Tháng hiện tại
+        var curMonth = curDate.getMonth() + 1;
+        // Năm hiện tại
+        var curYear = curDate.getFullYear();
+        // Gán vào thẻ HTML
+        document.getElementById('input_date').value = curYear + "-" + String(curMonth).padStart(2, '0') + "-" + String(curDay).padStart(2, '0');
+    }
+
+    createdate_for_input_date()
+</script>

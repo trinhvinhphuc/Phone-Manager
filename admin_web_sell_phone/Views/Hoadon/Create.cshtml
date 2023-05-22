@@ -1,0 +1,290 @@
+﻿@model admin_web_sell_phone.Models.HoaDonIndexModel
+@{
+    var kh = ViewData["kh"] as List<admin_web_sell_phone.Entity.tb_Khachhang>;
+    var nv = ViewData["nhanvien"] as List<admin_web_sell_phone.Entity.tb_Nhanvien>;
+    var dssp = ViewData["dssp"] as List<admin_web_sell_phone.Entity.tb_Sanpham>;
+    var onl_id = ViewContext.HttpContext.User.FindFirst("id").Value;
+}
+@using (Html.BeginForm())
+{
+    @Html.ValidationSummary(true)
+    <h1>Tạo mới hóa đơn</h1>
+
+    <h4>Hóa đơn</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-12">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="@Model.ID_KhachHang" class="control-label">Khách hàng</label>
+                <div class="col-md-12">
+                    <select name="ttkhach" class="form-select form-control">
+                        <option value="nm" selected="selected">------Người mới-----</option>
+                        @{
+                            foreach (var item in kh)
+                            {
+                                <option value="@item.ID_Khachhang">@item.TenKhachhang - @item.sdt</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label  class="control-label">Nhân viên thực hiện</label>
+                <div class="col-md-12">
+                    <select name="idnv" class="form-control">
+                        @{
+                            //int id = int.Parse(Session["userId"].ToString());
+
+                            foreach (var item in nv)
+                            {
+                                if(item.ID_Nhanvien == int.Parse(onl_id))
+                                {
+                                    <option value="@item.ID_Nhanvien" selected>@item.Tennhanvien</option>
+                                    continue;
+                                }
+                                <option value="@item.ID_Nhanvien">@item.Tennhanvien</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.Ngaytaophieu" class=" control-label">Ngày tạo phiếu</label>
+                <div class="col-md-12">
+                    @Html.TextBox("Ngaytaophieu", null, new { @class = "form-control", type = "Date", @id = "input_date" })
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.TongDon" class="control-label">Tổng thành tiền (đơn vị: đồng)</label>
+                <input asp-for="@Model.TongDon" class="form-control"  readonly type="number" />
+                <span asp-validation-for="@Model.TongDon" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Lưu" class="btn btn-primary mt-2" />
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <h2>Danh sách sản phẩm</h2>
+        </div>
+        <div class="col-12">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Tên sản phẩm</th>
+                        <th>Hình ảnh</th>
+                        <th>Giá bán</th>
+                        <th>Số lượng tồn kho</th>
+                        <th>Thêm vào hóa đơn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        foreach (var item in dssp)
+                        {
+                            <tr>
+                                <td id="ten_@item.ID_sanpham">
+                                    @item.Ten_Dienthoai
+                                </td>
+                                <td style="width: 100px; height: 100px;">
+                                    <img  src="~/@item.HinhAnh" class="img-thumbnail">
+                                </td>
+                                <td id="gb_@item.ID_sanpham">
+                                    @item.GiaBan.ToString("N0") đ
+                                </td>
+                                <td id="tk_@item.ID_sanpham">
+                                    @item.Soluong
+                                </td>
+                                <td>
+                                    <input type="number" value="1" id="sl_@item.ID_sanpham" min=" = 0" />
+                                    <input type="button" class="btn btn-success mx-2 btnclick" value="Thêm" id="@item.ID_sanpham" onclick="addchitiethoadon(this)" />
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="card-title">Chi tiết hóa đơn</div>
+                <table class="table table-responsive table-hover bg-white align-middle text-center">
+                    <thead>
+                        <tr>
+                            <th scope="col">
+                                Sản phẩm
+                            </th>
+                            <th scope="col">
+                                Giá Bán
+                            </th>
+                            <th scope="col">
+                                Số lượng mua
+                            </th>
+                            <th scope="col">
+                                Thành tiền
+                            </th>
+                            <th scope="col">
+                                Tùy chọn
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="chiTietHoaDon">
+                    </tbody>
+                </table>
+                <textarea id="listcthd" class="form-control d-none" name="listcthd"></textarea>
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+
+<script>
+    let listcthd = [];
+    const textAreaListCthd = document.querySelector("#listcthd");
+    const chitiethoadon = document.querySelector("#chiTietHoaDon");
+    var masp
+    function addchitiethoadon(btn) {
+        masp = btn.id;
+        var sl = parseInt(document.getElementById("sl_" + masp).value);
+        
+        for (i = 0; i < listcthd.length; i++) {
+            if (listcthd[i].id == masp) {
+                if (listcthd[i].sl + sl > parseInt(document.getElementById("tk_" + masp).innerText)) {
+                    alert("Số lượng sản phẩm không hợp lệ!!!!")
+                    return
+                }
+
+                listcthd[i].sl = listcthd[i].sl + sl;
+                alert("Đã thêm sản phẩm vào đơn hàng");
+                
+                update_Thanhtien();
+                return;
+            }
+        }
+
+        if (sl > parseInt(document.getElementById("tk_" + masp).innerText)) {
+            alert("Số lượng sản phẩm không hợp lệ!!!!")
+            return
+        }
+
+        const cthd = {
+            id: parseInt(masp),
+            sl: sl,
+            gb: parseInt(document.getElementById("gb_" + masp).innerText.split(',').join('').slice(0, -2)),
+            ten: document.getElementById("ten_" + masp).innerText
+        };
+        
+        listcthd.push(cthd);
+        alert("Đã thêm sản phẩm vào đơn hàng");
+        
+        update_Thanhtien();
+    }
+
+    function update_Thanhtien() {
+        var total = 0;
+        
+        for (i = 0; i < listcthd.length; i++) {
+            total += listcthd[i].sl * listcthd[i].gb;
+            
+        }
+       
+        document.getElementById("TongDon").value = total;
+        update_hoadon()
+    }
+
+    function update_hoadon() {
+        document.getElementById("chiTietHoaDon").innerHTML = "";
+        
+        for (i = 0; i < listcthd.length; i++) {
+            const tr = document.createElement('tr');
+
+            const tdTen = document.createElement('td');
+            tdTen.append(listcthd[i].ten);
+
+            const tdgiaban = document.createElement('td');
+            tdgiaban.append(listcthd[i].gb);
+
+            const tdsoluong = document.createElement('td');
+            tdsoluong.className = 'd-flex flex-row justify-content-center';
+            const inputsoluong = document.createElement('input');
+            inputsoluong.className = 'form-control w-50'
+            inputsoluong.setAttribute('name', `${listcthd[i].id}`);
+            inputsoluong.setAttribute('value', listcthd[i].sl);
+            inputsoluong.setAttribute('min', 1);
+            inputsoluong.setAttribute('autocomplete', 'off');
+            inputsoluong.setAttribute('type', 'number');
+            inputsoluong.addEventListener('input', (e) => {
+                listcthd.forEach((cthd) => {
+                    if (cthd.id == parseInt(e.target.name)) {
+                        if (parseInt(e.target.value) <= parseInt(document.getElementById("tk_" + cthd.id).innerText)) {
+                            cthd.sl = parseInt(e.target.value);
+
+                            update_Thanhtien();
+                            textAreaListCthd.value = JSON.stringify(listcthd);
+                        }
+                        else {
+                            e.target.value = cthd.sl;
+                            alert("Số lượng sản phẩm không hợp lệ!!!!")
+                            return
+                        }
+                    }
+                })
+            })
+            tdsoluong.append(inputsoluong);
+
+            const tdThanhtien = document.createElement('td');
+            var total = listcthd[i].sl * listcthd[i].gb;
+            tdThanhtien.append(total);
+
+            const tdButton = document.createElement('td');
+            const button = document.createElement('button');
+            button.className = 'btn btn-outline-danger mx-2';
+            button.setAttribute('type', 'button');
+            button.textContent = 'xóa';
+            button.dataset.id = listcthd[i].id;
+            button.addEventListener('click', async (e) => {
+                const id = parseInt(e.target.dataset.id);
+                const tr = e.target.parentNode.parentNode;
+
+                tr.parentNode.removeChild(tr);
+                listcthd = listcthd.filter(cthd => cthd.id != id);
+                textAreaListCthd.value = JSON.stringify(listcthd);
+                update_Thanhtien();
+            });
+            tdButton.append(button);
+
+            textAreaListCthd.value = JSON.stringify(listcthd);
+            tr.append(tdTen, tdgiaban, tdsoluong, tdThanhtien, tdButton);
+            chitiethoadon.appendChild(tr);
+        }
+    }
+
+    function createdate_for_input_date() {
+        var curDate = new Date();
+        // Ngày hiện tại
+        var curDay = curDate.getDate();
+        // Tháng hiện tại
+        var curMonth = curDate.getMonth() + 1;
+        // Năm hiện tại
+        var curYear = curDate.getFullYear();
+        // Gán vào thẻ HTML
+        document.getElementById('input_date').value = curYear + "-" + String(curMonth).padStart(2, '0') + "-" + String(curDay).padStart(2, '0');
+    }
+
+    createdate_for_input_date()
+</script>
